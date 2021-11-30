@@ -23,3 +23,6 @@ FROM Employees E INNER JOIN
      ON O.EmployeeID=E.EmployeeID
 GROUP BY E.EmployeeID,E.FirstName,E.LastName
 HAVING COUNT(*) >100
+
+SELECT C.*
+FROM Customers C
