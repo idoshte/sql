@@ -4,7 +4,7 @@ USE [idodb]
 DECLARE @EndDate DATE =GETDATE()
 
 declare @minDate date = (select MAX(FullDate)
-FROM Dim_Date)
+FROM Dim_Dates)
 
 SET @minDate =DATEADD(DAY,1,@minDate)
 
