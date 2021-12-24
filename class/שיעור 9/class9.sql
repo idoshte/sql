@@ -1,13 +1,14 @@
 --1 
 
 SELECT C.CompanyName,
+       C.COUNTRY,
        COUNT(DISTINCT O.OrderID) AS CNTORDERS,
        SUM(OD.Quantity*OD.UnitPrice) SUMREV
-FROM Customers C INNER JOIN
-     ORDERS O ON O.CustomerID=C.CustomerID INNER JOIN
+FROM Customers C LEFT JOIN
+     ORDERS O ON O.CustomerID=C.CustomerID LEFT JOIN
      [Order Details] OD ON OD.OrderID=O.OrderID
 WHERE C.Country IN ('spain','england')
-GROUP BY C.CustomerID,C.CompanyName
+GROUP BY C.CustomerID,C.CompanyName,C.Country
 HAVING COUNT(DISTINCT O.OrderID) =0 OR 
        COUNT(DISTINCT O.OrderID)>=10
 
