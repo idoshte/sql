@@ -7,7 +7,7 @@ SELECT C.CompanyName,
 FROM Customers C LEFT JOIN
      ORDERS O ON O.CustomerID=C.CustomerID LEFT JOIN
      [Order Details] OD ON OD.OrderID=O.OrderID
-WHERE C.Country IN ('spain','england')
+WHERE C.Country IN ('spain','FRANCE')
 GROUP BY C.CustomerID,C.CompanyName,C.Country
 HAVING COUNT(DISTINCT O.OrderID) =0 OR 
        COUNT(DISTINCT O.OrderID)>=10
