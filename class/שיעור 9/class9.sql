@@ -110,3 +110,34 @@ WHERE CAT.CategoryName LIKE 'CHAI' AND
          )
 
     AND 100
+
+
+    -- exam problem 
+
+    SELECT E.FirstName + ' ' + E.LastName AS 'FULLNAME',
+           SUM(OD.Quantity*OD.UnitPrice) AS 'SUMREV',
+           SUM(OD.Quantity*OD.UnitPrice)/
+           (
+                SELECT SUM(OD.Quantity*OD.UnitPrice)
+                FROM [Order Details] OD 
+           ) AS 'TRUMA'
+    FROM Employees E INNER JOIN 
+         Orders O ON O.EmployeeID=E.EmployeeID INNER JOIN
+         [Order Details] OD ON OD.OrderID=O.OrderID
+     WHERE DATEPART(MONTH,O.OrderDate) IN
+
+          (
+               SELECT DATEPART(MONTH,O.OrderDate)
+               FROM Orders O
+               WHERE O.CustomerID LIKE 'ALFKI'
+          )
+     GROUP BY E.EmployeeID,E.FirstName,E.LastName
+     HAVING COUNT(DisTINCT O.OrderID)>30 OR
+            COUNT(DisTINCT O.OrderID)>
+
+            (
+                 SELECT COUNT(*)
+                 FROM Employees E INNER JOIN 
+                      ORDERS O ON O.EmployeeID=E.EmployeeID
+                 WHERE E.EmployeeID=5
+            )
