@@ -139,5 +139,5 @@ WHERE CAT.CategoryName LIKE 'CHAI' AND
                  SELECT COUNT(*)
                  FROM Employees E INNER JOIN 
                       ORDERS O ON O.EmployeeID=E.EmployeeID
-                 WHERE E.EmployeeID=5
+                 WHERE E.ReportsTo=5
             )
