@@ -385,3 +385,124 @@ AND P.UnitPrice BETWEEN
          Categories C ON C.CategoryID=P.CategoryID
     WHERE C.CategoryName ='PRODUCE'
 ) AND 100
+
+
+-- LESSON 10
+
+--1
+
+SELECT DISTINCT C.CategoryName
+FROM Categories C INNER JOIN 
+     Products P ON P.CategoryID=C.CategoryID
+WHERE P.UnitPrice>
+          (
+               SELECT AVG(P.UnitPrice)
+               FROM Categories C INNER JOIN 
+                    Products P ON P.CategoryID=C.CategoryID
+               WHERE C.CategoryName LIKE 'PRODUCE'
+          )
+
+--2
+
+-- SELECT O.CustomerID,
+--        O.
+-- FROM Orders O
+-- --GROUP BY O.CustomerID,O.OrderID
+
+--3
+
+SELECT C.CompanyName,
+       SUM(OD.UnitPrice*OD.Quantity) SR,
+       SUM(OD.UnitPrice*OD.Quantity)/
+       (
+            SELECT SUM(OD.UnitPrice*OD.Quantity)
+            FROM [Order Details] OD
+       ) AS T
+FROM Customers C INNER JOIN 
+     Orders O ON O.CustomerID=C.CustomerID INNER JOIN 
+     [Order Details] OD ON OD.OrderID=O.OrderID
+GROUP BY C.CustomerID,C.CompanyName
+
+--4
+
+SELECT C.CompanyName,
+       COUNT(*) CNTORDERS,
+       DATEPART(YEAR,MAX(O.OrderDate)) LASTYEAR,
+       DATEPART(MONTH,MAX(O.OrderDate)) LASTMONTH
+FROM Customers C LEFT JOIN 
+     Orders O ON O.CustomerID=C.CustomerID
+GROUP BY C.CustomerID,C.CompanyName
+HAVING COUNT(*) =0 OR 
+       AVG(O.Freight)<=
+             (
+                  SELECT AVG(O.Freight)
+                  FROM Customers C INNER JOIN
+                       Orders O ON O.CustomerID=C.CustomerID
+                  WHERE C.City LIKE 'LONDON'
+             )
+
+--7
+SELECT CFILTER.*,
+       OCALC.SF,
+       ODCALC.SR
+FROM (
+     SELECT C.CustomerID,
+            C.CompanyName,
+            C.Country
+     FROM Customers C 
+     WHERE C.CompanyName LIKE '[ABP]%'
+
+) AS CFILTER INNER JOIN 
+     
+     (
+          SELECT O.CustomerID,
+                 SUM(O.Freight) SF
+          FROM Orders O
+          GROUP BY O.CustomerID
+
+
+     ) AS OCALC ON OCALC.CustomerID=CFILTER.CustomerID INNER JOIN
+
+     (
+          SELECT O.CustomerID,
+                 SUM(OD.Quantity*OD.UnitPrice) SR
+          FROM Orders O INNER JOIN 
+               [Order Details] OD ON OD.OrderID=O.OrderID
+          GROUP BY O.CustomerID
+     ) AS ODCALC ON ODCALC.CustomerID=CFILTER.CustomerID
+
+-- LESSON 13
+--1
+
+
+SELECT OFILTER.[YEAR],
+       OFILTER.[MONTH],
+       OCALAC.SQ
+FROM 
+
+(
+     SELECT DATEPART(YEAR,O.OrderDate) YEAR,
+            DATEPART(MONTH,O.OrderDate) MONTH
+     FROM ORDERS O 
+     WHERE DATEPART(YEAR,O.OrderDate)%2=0 AND 
+           DATEPART(MONTH,O.OrderDate)%2=0
+     GROUP BY DATEPART(YEAR,O.OrderDate),
+               DATEPART(MONTH,O.OrderDate)
+     HAVING COUNT(*)>30
+) AS OFILTER INNER JOIN 
+
+(
+     SELECT DATEPART(YEAR,O.OrderDate) YEAR,
+            DATEPART(MONTH,O.OrderDate) MONTH,
+            SUM(OD.Quantity) SQ
+     FROM Orders O INNER JOIN 
+          [Order Details] OD ON OD.OrderID=O.OrderID
+     WHERE OD.Quantity NOT BETWEEN 12 AND 50
+     GROUP BY DATEPART(YEAR,O.OrderDate),
+              DATEPART(MONTH,O.OrderDate)
+) AS OCALAC ON OCALAC.[YEAR]=OFILTER.[YEAR] AND 
+               OCALAC.[MONTH]=OFILTER.[MONTH]
+
+
+
+--2
