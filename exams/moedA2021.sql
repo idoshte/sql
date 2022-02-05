@@ -41,8 +41,7 @@ SELECT C.CategoryName, sum(od.Quantity*od.UnitPrice) as 'SUM',  AVG(OD.Quantity)
 
  --5
 
- SELECT
- FROM CATE
+
 
  --6
  select c.*
