@@ -1,0 +1,387 @@
+--lesson 5
+--2
+SELECT C.CustomerID,
+       SUM(OD.Quantity*OD.UnitPrice) REV
+FROM Customers C INNER JOIN 
+     Orders O ON O.CustomerID=C.CustomerID INNER JOIN
+     [Order Details] OD  ON OD.OrderID=O.OrderID
+GROUP BY C.CustomerID
+
+--4
+SELECT DATEPART(YEAR,O.OrderDate)YEAR,DATEPART(QUARTER,O.OrderDate) QUARTER,COUNT(*) CNTORDERS
+FROM Orders O
+
+GROUP BY DATEPART(YEAR,O.OrderDate),DATEPART(QUARTER,O.OrderDate)
+
+--5
+
+SELECT *
+FROM Orders O INNER JOIN 
+     [Order Details] OD ON OD.OrderID=O.OrderID INNER JOIN 
+     Products P ON OD.ProductID=P.ProductID
+
+
+--5B
+
+--1
+
+SELECT C.CustomerID,C.CompanyName,COUNT(*) CNTORDERS,SUM(O.Freight) SUMFRIEGHT
+FROM Customers C INNER JOIN 
+ORDERS O ON O.CustomerID=C.CustomerID
+GROUP BY C.CustomerID,C.CompanyName
+
+--3
+
+SELECT C.CustomerID,
+       SUM(OD.Quantity*OD.UnitPrice) REV,
+       COUNT(*) CNTROWS
+
+FROM CUSTOMERS C INNER JOIN 
+     ORDERS O ON O.CustomerID=C.CustomerID INNER JOIN
+     [Order Details] OD ON OD.OrderID=O.OrderID
+     WHERE OD.Quantity>10
+     GROUP BY C.CustomerID
+
+--4
+SELECT S.SupplierID,
+       SUM(OD.Quantity) SUMQUANTITY
+FROM Suppliers S INNER JOIN 
+     Products P ON P.SupplierID=S.SupplierID INNER JOIN
+     [Order Details] OD ON OD.ProductID=P.ProductID
+WHERE P.UnitPrice >10
+GROUP BY S.SupplierID
+
+--5
+
+SELECT DATEPART(MONTH,O.OrderDate) MONTH,
+       AVG(O.Freight) AVGFRIEGHT,
+       COUNT(*) CNTORDERS 
+FROM Orders O 
+GROUP BY DATEPART(MONTH,O.OrderDate)
+ORDER BY DATEPART(MONTH,O.OrderDate) DESC
+
+--6
+
+SELECT C.Country, COUNT(*) CUSTOMES
+FROM Customers C 
+GROUP BY C.Country
+
+--LESON 6
+SELECT E.FirstName+' '+E.LastName FULLNAME,
+       AVG(OD.UnitPrice) AVGUNITPRICE,
+       AVG(OD.Quantity) AVGQUANTITY
+FROM Employees E INNER JOIN 
+     Orders O ON O.EmployeeID=E.EmployeeID INNER JOIN 
+     [Order Details] OD ON OD.OrderID=O.OrderID
+WHERE DATEPART(YEAR,O.OrderDate)=1996 AND E.City LIKE 'LONDON'
+GROUP BY E.EmployeeID,E.FirstName,E.LastName
+HAVING SUM(OD.Quantity*OD.UnitPrice)>15000
+
+--lesson 6 tirgul
+
+SELECT DATEPART(YEAR,O.OrderDate) YEAR , 
+       DATEPART(MONTH,O.OrderDate)MONTH,
+       SUM(O.Freight) SUMFREIGHT
+FROM ORDERS O 
+GROUP BY DATEPART(YEAR,O.OrderDate), DATEPART(MONTH,O.OrderDate)
+ORDER BY DATEPART(YEAR,O.OrderDate), DATEPART(MONTH,O.OrderDate)
+
+--2
+SELECT C.Country,C.City, COUNT(*) CNTORDERS
+FROM CUSTOMERS C INNER JOIN 
+     Orders O ON O.CustomerID=C.CustomerID
+GROUP BY C.Country,C.City
+
+--3
+SELECT C.CustomerID, COUNT(*) CNTORDRS
+FROM Customers C INNER JOIN
+     Orders O ON O.CustomerID=C.CustomerID
+GROUP BY C.CustomerID
+HAVING COUNT(*)>15
+
+
+--4
+
+SELECT C.CustomerID,
+        SUM(OD.Quantity*OD.UnitPrice)
+FROM Customers C INNER JOIN 
+     Orders O ON O.CustomerID=C.CustomerID INNER JOIN 
+     [Order Details] OD ON OD.OrderID=O.OrderID
+     WHERE OD.Quantity*OD.UnitPrice NOT BETWEEN 10 AND 300 AND O.Freight>30
+     GROUP BY C.CustomerID
+     HAVING SUM(OD.UnitPrice*OD.Quantity)>30000
+
+--5
+SELECT C.CompanyName,
+       SUM(OD.UnitPrice*OD.Quantity),
+       MAX(OD.Quantity)
+FROM Customers C INNER JOIN 
+     Orders O ON O.CustomerID=C.CustomerID INNER JOIN 
+     [Order Details] OD ON OD.OrderID=O.OrderID INNER JOIN 
+     Products P ON OD.ProductID=P.ProductID
+WHERE P.QuantityPerUnit LIKE '%BOXES%' AND P.UnitsInStock>50
+GROUP BY C.CustomerID,C.CompanyName
+HAVING SUM(OD.UnitPrice*OD.Quantity)>1500
+
+--6
+
+SELECT C.COUNTRY,
+       COUNT(*)
+FROM Customers C 
+GROUP BY C.Country
+HAVING COUNT(*) >10
+
+--7
+
+SELECT C.COUNTRY,C.ContactTitle,
+       COUNT(*)
+FROM Customers C 
+--WHERE C.ContactTitle LIKE 'OWNER'
+GROUP BY C.Country
+HAVING COUNT(*) >10
+
+--6B
+--1
+
+SELECT DISTINCT C.*,O.*
+FROM Customers C INNER JOIN 
+    Orders O ON O.CustomerID=C.CustomerID INNER JOIN 
+    [Order Details] OD ON OD.OrderID=O.OrderID
+WHERE O.Freight NOT BETWEEN 12 AND 800 AND
+OD.Quantity*OD.UnitPrice BETWEEN 300 AND 3000 AND
+DATEPART(MONTH,O.OrderDate)%2=0
+
+--2
+SELECT SUM(O.Freight)
+FROM Orders O
+
+--3
+SELECT P.ProductName,
+       OD.UnitPrice*OD.Quantity,
+       S.CompanyName
+FROM Suppliers S INNER JOIN 
+     Products P ON P.SupplierID=S.SupplierID INNER JOIN 
+     [Order Details] OD ON OD.ProductID=P.ProductID INNER JOIN
+     Orders O ON OD.OrderID=O.OrderID INNER JOIN 
+     Employees E ON O.EmployeeID=E.EmployeeID
+WHERE P.QuantityPerUnit LIKE 'BOXES' AND DATEPART(YEAR,E.HireDate)<1992
+
+--4
+SELECT C.CompanyName,
+       SUM(OD.UnitPrice*OD.Quantity) SUMREV,
+       COUNT(*) CNTPRODUCTS
+FROM Customers C INNER JOIN 
+     ORDERS O ON O.CustomerID=C.CustomerID INNER JOIN 
+     [Order Details] OD ON OD.OrderID=O.OrderID
+WHERE --OD.UnitPrice*OD.Quantity>300 AND 
+DATEPART(MONTH,O.OrderDate) IN (7,8)
+GROUP BY C.CustomerID,C.CompanyName
+HAVING SUM(OD.UnitPrice*OD.Quantity)>300
+
+--5
+SELECT  DATEPART(YEAR,O.OrderDate) YEAR,
+        COUNT(DISTINCT O.OrderID) CNTORDERS,
+        COUNT(*) NUMROWS,
+        SUM(Quantity) SUMQUANTITY
+FROM Orders O INNER JOIN 
+     [Order Details] OD ON OD.OrderID=O.OrderID
+GROUP BY DATEPART(YEAR,O.OrderDate)
+
+--6
+
+SELECT P.ProductName,
+       COUNT(DiSTINCT O.ShipCity) CNTSHIPCITY,
+       COUNT(*) CNTROWS
+FROM Products P INNER JOIN 
+     [Order Details] OD ON OD.ProductID=P.ProductID INNER JOIN 
+     Orders O ON OD.OrderID=O.OrderID
+GROUP BY P.ProductID,P.ProductName
+ORDER BY P.ProductName
+
+--LESS 8
+--1 
+SELECT C.CustomerID,
+       SUM(OD.UnitPrice*OD.Quantity) SUMREV
+FROM CUSTOMERS C INNER JOIN 
+     Orders O ON O.CustomerID=C.CustomerID INNER JOIN 
+     [Order Details] OD ON OD.OrderID=O.OrderID
+WHERE C.Country IN ('USA','FRANCE') AND DATEPART(MONTH,O.OrderDate) IN (7,8)
+GROUP BY C.CustomerID
+HAVING SUM(OD.UnitPrice*OD.Quantity)>8500
+
+--2
+SELECT E.FirstName+ ' '+E.LastName 'FullName',
+       count(*) cntorders
+FROM Employees E INNER JOIN Orders O ON 
+     O.EmployeeID=E.EmployeeID
+WHERE O.Freight>250
+GROUP BY E.EmployeeID,E.FirstName,E.LastName
+--HAVING COUNT(*)>100
+
+--3
+SELECT DATEPART(YEAR,O.OrderDate),DATEPART(MONTH,O.OrderDate), COUNT(*)
+FROM Orders O 
+GROUP BY DATEPART(YEAR,O.OrderDate),DATEPART(MONTH,O.OrderDate)
+
+SELECT C.CustomerID,C.CompanyName,
+       COUNT(DISTINCT O.OrderID) CNTORDERS,
+       SUM(OD.Quantity*OD.UnitPrice) SR
+FROM CUSTOMERS C LEFT JOIN 
+     Orders O ON O.CustomerID=C.CustomerID LEFT JOIN
+     [Order Details] OD ON OD.OrderID=O.OrderID
+WHERE C.Country IN ('SPAIN','FRANCE')
+
+GROUP BY C.CustomerID ,C.CompanyName
+HAVING COUNT(DISTINCT O.OrderID) NOT BETWEEN 1 AND 10
+
+--4
+
+SELECT C.Country,
+       COUNT(DISTINCT C.CustomerID) CNTCUSTOMERS,
+       COUNT(DISTINCT O.OrderID) CNTORDERS,
+       SUM(OD.Quantity*OD.UnitPrice) SR
+FROM Customers C INNER JOIN 
+     Orders O ON O.CustomerID=C.CustomerID INNER JOIN 
+     [Order Details] OD ON OD.OrderID=O.OrderID
+WHERE DATEDIFF(DAY,O.RequiredDate,O.ShippedDate)>3
+GROUP BY C.Country
+HAVING SUM(OD.Quantity*OD.UnitPrice)>500
+
+--5
+SELECT C.Country,
+       SUM(OD.Quantity*OD.UnitPrice) SR
+FROM Customers C INNER JOIN 
+     Orders O ON O.CustomerID=C.CustomerID INNER JOIN 
+     [Order Details] OD ON OD.OrderID=O.OrderID
+GROUP BY C.Country
+
+--6
+SELECT C.*
+FROM Customers C
+WHERE C.CustomerID NOT IN (SELECT O.CustomerID FROM ORDERS O)
+
+SELECT * FROM ORDERS
+
+
+--9
+SELECT *
+FROM Customers C INNER JOIN 
+     Orders O ON O.CustomerID=C.CustomerID
+WHERE O.OrderDate = (
+
+    SELECT O.OrderDate 
+    FROM ORDERS O 
+) 
+
+
+--3
+SELECT P.*
+FROM Products P
+WHERE P.CategoryID =
+(
+    SELECT C.CategoryID
+    FROM Categories C INNER JOIN 
+         Products P ON P.CategoryID=C.CategoryID
+    WHERE P.ProductName LIKE 'TOFU'
+)
+
+--4 
+
+SELECT P.*
+FROM Products P 
+WHERE P.UnitPrice = 
+(
+    SELECT MAX(P.UnitPrice)
+    FROM PRODUCTS P
+)
+     
+--5
+
+SELECT DISTINCT S.CompanyName
+FROM Suppliers S INNER JOIN 
+     Products P ON P.SupplierID=S.SupplierID
+WHERE P.ProductID IN 
+(
+    SELECT OD.ProductID
+    FROM  
+         [Order Details] OD  INNER JOIN
+         Orders O ON O.OrderID=OD.OrderID
+    WHERE O.CustomerID LIKE 'ALFKI'
+)
+
+SELECT DISTINCT C.CompanyName
+FROM Customers C INNER JOIN 
+     ORDERS O ON O.CustomerID=C.CustomerID
+WHERE C.Country LIKE 'UK' AND 
+      O.EmployeeID IN (
+
+          SELECT E.EmployeeID
+          FROM Employees E 
+          WHERE E.Country LIKE 'USA'
+      )
+
+--5
+
+SELECT distinct od.OrderID
+FROM [Order Details] OD
+WHERE OD.ProductID IN 
+(
+    SELECT OD.ProductID
+    FROM [Order Details] OD
+    WHERE OD.Quantity>50
+)
+
+
+
+SELECT C.CustomerID,
+       SUM(OD.UnitPrice*OD.Quantity) SR,
+       SUM(OD.UnitPrice*OD.Quantity)/
+       (
+           SELECT SUM(OD.UnitPrice*OD.Quantity)
+           FROM [Order Details] OD
+       ) AS T
+FROM Customers C INNER JOIN 
+     ORDERS O ON O.CustomerID=C.CustomerID INNER JOIN 
+     [Order Details] OD ON OD.OrderID=O.OrderID
+GROUP BY C.CustomerID
+
+
+SELECT S.CompanyName,
+       COUNT(*) CNTORDERS,
+       SUM(O.Freight) SUMFREIGHT
+FROM Suppliers S INNER JOIN 
+     Orders O ON O.ShipVia = S.SupplierID
+GROUP BY S.SupplierID,S.CompanyName
+
+SELECT S.CompanyName,
+       AVG(P.UnitPrice)- 
+       (
+           SELECT AVG(P.UnitPrice)
+           FROM Products P 
+       )
+FROM Suppliers S INNER JOIN 
+     Products P ON P.SupplierID=S.SupplierID
+WHERE P.ProductID IN 
+        (
+            SELECT P.ProductID
+            FROM Categories C INNER JOIN 
+                 Products P ON P.CategoryID=C.CategoryID
+            WHERE C.CategoryName LIKE 'BEVERAGES'
+        )
+GROUP BY S.SupplierID,S.CompanyName
+
+SELECT DISTINCT P.ProductName
+FROM Products P
+WHERE P.CategoryID =
+(
+    SELECT P.CategoryID
+    FROM Products P 
+    WHERE P.ProductName LIKE 'CHAI'
+) 
+AND P.UnitPrice BETWEEN 
+(
+    SELECT AVG(P.UnitPrice)
+    FROM Products P INNER JOIN 
+         Categories C ON C.CategoryID=P.CategoryID
+    WHERE C.CategoryName ='PRODUCE'
+) AND 100
